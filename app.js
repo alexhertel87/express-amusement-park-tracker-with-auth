@@ -1,27 +1,35 @@
+const express = require("express");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
 
-const express = require('express');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-
-const { environment } = require('./config');
-const indexRoutes = require('./routes');
-const parkRoutes = require('./routes/park');
-const attractionRoutes = require('./routes/attraction');
+const { environment } = require("./config");
+const indexRoutes = require("./routes");
+const parkRoutes = require("./routes/park");
+const attractionRoutes = require("./routes/attraction");
 
 const app = express();
 
-app.set('view engine', 'pug');
+app.set("view engine", "pug");
 
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(indexRoutes);
 app.use(parkRoutes);
 app.use(attractionRoutes);
 
+app.use(
+  session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 // Catch unhandled requests and forward to error handler.
 app.use((req, res, next) => {
-  const err = new Error('The requested page couldn\'t be found.');
+  const err = new Error("The requested page couldn't be found.");
   err.status = 404;
   next(err);
 });
@@ -30,7 +38,7 @@ app.use((req, res, next) => {
 
 // Error handler to log errors.
 app.use((err, req, res, next) => {
-  if (environment === 'production' || environment === 'test') {
+  if (environment === "production" || environment === "test") {
     // TODO Log the error to the database.
   } else {
     console.error(err);
@@ -42,8 +50,8 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.status === 404) {
     res.status(404);
-    res.render('page-not-found', {
-      title: 'Page Not Found',
+    res.render("page-not-found", {
+      title: "Page Not Found",
     });
   } else {
     next(err);
@@ -53,9 +61,9 @@ app.use((err, req, res, next) => {
 // Generic error handler.
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  const isProduction = environment === 'production';
-  res.render('error', {
-    title: 'Server Error',
+  const isProduction = environment === "production";
+  res.render("error", {
+    title: "Server Error",
     message: isProduction ? null : err.message,
     stack: isProduction ? null : err.stack,
   });
