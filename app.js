@@ -2,6 +2,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+
 
 const { environment } = require('./config');
 const indexRoutes = require('./routes');
@@ -15,6 +17,7 @@ app.set('view engine', 'pug');
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+
 app.use(indexRoutes);
 app.use(parkRoutes);
 app.use(attractionRoutes);
